@@ -1,6 +1,9 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:mental_mood/DataBase/database.dart';
 import 'package:provider/provider.dart';
+
+import 'emotion_selection_page.dart';
 
 void main() {
   runApp(const HomePage());
@@ -54,12 +57,57 @@ class _HomePageState extends State<HomePage> {
             },
             future: _getEmozioneFromDataBase(),
         ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          _navigateToDetail('Aggiungi nuova emozione', EmozioneCompanion(
+            nome: Value(''),
+            imgPath: Value(''),
+            valore: Value(0),
+          ));
+        },
+        shape: const CircleBorder(
+          side: BorderSide(color: Colors.black, width: 2),
+        ),
+        child: const Icon(Icons.add),
+      )
     );
   }
   Future<List<EmozioneData>> _getEmozioneFromDataBase() async{
     return await dataBase.getEmozioneList();
   }
   Widget listEmozioniUI(List<EmozioneData> listEmozioni) {
-    return Container();
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: ListView.builder(
+        itemCount: listEmozioni.length,
+        itemBuilder: (context, index) {
+          EmozioneData emozione = listEmozioni[index];
+          return Card(
+            child: ListTile(
+              title: Text(emozione.nome),
+              subtitle: Text("Valore: ${emozione.valore}"), // Leggermente migliorato per chiarezza
+              onTap: () {
+                _navigateToDetail(
+                  emozione.nome,
+                  EmozioneCompanion(
+                    nome: Value(emozione.nome),
+                    imgPath: Value(emozione.imgPath),
+                    valore: Value(emozione.valore),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _navigateToDetail(String title, EmozioneCompanion emozioneCompanion) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => EmotionSelectorPage(
+        title: title,
+        emozioneCompanion: emozioneCompanion
+    ),),);
   }
 }
+

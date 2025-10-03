@@ -80,7 +80,7 @@ class $EmozioneTable extends Emozione
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {nome};
   @override
   EmozioneData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -346,7 +346,7 @@ class $UtenteTable extends Utente with TableInfo<$UtenteTable, UtenteData> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {username};
   @override
   UtenteData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -846,12 +846,318 @@ class ConsiglioCompanion extends UpdateCompanion<ConsiglioData> {
   }
 }
 
+class $EmozioneRegistrataTable extends EmozioneRegistrata
+    with TableInfo<$EmozioneRegistrataTable, EmozioneRegistrataData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EmozioneRegistrataTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _utenteUsernameMeta = const VerificationMeta(
+    'utenteUsername',
+  );
+  @override
+  late final GeneratedColumn<String> utenteUsername = GeneratedColumn<String>(
+    'utente_username',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES utente (username)',
+    ),
+  );
+  static const VerificationMeta _emozioneNomeMeta = const VerificationMeta(
+    'emozioneNome',
+  );
+  @override
+  late final GeneratedColumn<String> emozioneNome = GeneratedColumn<String>(
+    'emozione_nome',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES emozione (nome)',
+    ),
+  );
+  static const VerificationMeta _dataRegistrazioneMeta = const VerificationMeta(
+    'dataRegistrazione',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dataRegistrazione =
+      GeneratedColumn<DateTime>(
+        'data_registrazione',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    utenteUsername,
+    emozioneNome,
+    dataRegistrazione,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'emozione_registrata';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EmozioneRegistrataData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('utente_username')) {
+      context.handle(
+        _utenteUsernameMeta,
+        utenteUsername.isAcceptableOrUnknown(
+          data['utente_username']!,
+          _utenteUsernameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_utenteUsernameMeta);
+    }
+    if (data.containsKey('emozione_nome')) {
+      context.handle(
+        _emozioneNomeMeta,
+        emozioneNome.isAcceptableOrUnknown(
+          data['emozione_nome']!,
+          _emozioneNomeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_emozioneNomeMeta);
+    }
+    if (data.containsKey('data_registrazione')) {
+      context.handle(
+        _dataRegistrazioneMeta,
+        dataRegistrazione.isAcceptableOrUnknown(
+          data['data_registrazione']!,
+          _dataRegistrazioneMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dataRegistrazioneMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {
+    utenteUsername,
+    emozioneNome,
+    dataRegistrazione,
+  };
+  @override
+  EmozioneRegistrataData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EmozioneRegistrataData(
+      utenteUsername: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}utente_username'],
+      )!,
+      emozioneNome: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emozione_nome'],
+      )!,
+      dataRegistrazione: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data_registrazione'],
+      )!,
+    );
+  }
+
+  @override
+  $EmozioneRegistrataTable createAlias(String alias) {
+    return $EmozioneRegistrataTable(attachedDatabase, alias);
+  }
+}
+
+class EmozioneRegistrataData extends DataClass
+    implements Insertable<EmozioneRegistrataData> {
+  final String utenteUsername;
+  final String emozioneNome;
+  final DateTime dataRegistrazione;
+  const EmozioneRegistrataData({
+    required this.utenteUsername,
+    required this.emozioneNome,
+    required this.dataRegistrazione,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['utente_username'] = Variable<String>(utenteUsername);
+    map['emozione_nome'] = Variable<String>(emozioneNome);
+    map['data_registrazione'] = Variable<DateTime>(dataRegistrazione);
+    return map;
+  }
+
+  EmozioneRegistrataCompanion toCompanion(bool nullToAbsent) {
+    return EmozioneRegistrataCompanion(
+      utenteUsername: Value(utenteUsername),
+      emozioneNome: Value(emozioneNome),
+      dataRegistrazione: Value(dataRegistrazione),
+    );
+  }
+
+  factory EmozioneRegistrataData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EmozioneRegistrataData(
+      utenteUsername: serializer.fromJson<String>(json['utenteUsername']),
+      emozioneNome: serializer.fromJson<String>(json['emozioneNome']),
+      dataRegistrazione: serializer.fromJson<DateTime>(
+        json['dataRegistrazione'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'utenteUsername': serializer.toJson<String>(utenteUsername),
+      'emozioneNome': serializer.toJson<String>(emozioneNome),
+      'dataRegistrazione': serializer.toJson<DateTime>(dataRegistrazione),
+    };
+  }
+
+  EmozioneRegistrataData copyWith({
+    String? utenteUsername,
+    String? emozioneNome,
+    DateTime? dataRegistrazione,
+  }) => EmozioneRegistrataData(
+    utenteUsername: utenteUsername ?? this.utenteUsername,
+    emozioneNome: emozioneNome ?? this.emozioneNome,
+    dataRegistrazione: dataRegistrazione ?? this.dataRegistrazione,
+  );
+  EmozioneRegistrataData copyWithCompanion(EmozioneRegistrataCompanion data) {
+    return EmozioneRegistrataData(
+      utenteUsername: data.utenteUsername.present
+          ? data.utenteUsername.value
+          : this.utenteUsername,
+      emozioneNome: data.emozioneNome.present
+          ? data.emozioneNome.value
+          : this.emozioneNome,
+      dataRegistrazione: data.dataRegistrazione.present
+          ? data.dataRegistrazione.value
+          : this.dataRegistrazione,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EmozioneRegistrataData(')
+          ..write('utenteUsername: $utenteUsername, ')
+          ..write('emozioneNome: $emozioneNome, ')
+          ..write('dataRegistrazione: $dataRegistrazione')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(utenteUsername, emozioneNome, dataRegistrazione);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EmozioneRegistrataData &&
+          other.utenteUsername == this.utenteUsername &&
+          other.emozioneNome == this.emozioneNome &&
+          other.dataRegistrazione == this.dataRegistrazione);
+}
+
+class EmozioneRegistrataCompanion
+    extends UpdateCompanion<EmozioneRegistrataData> {
+  final Value<String> utenteUsername;
+  final Value<String> emozioneNome;
+  final Value<DateTime> dataRegistrazione;
+  final Value<int> rowid;
+  const EmozioneRegistrataCompanion({
+    this.utenteUsername = const Value.absent(),
+    this.emozioneNome = const Value.absent(),
+    this.dataRegistrazione = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  EmozioneRegistrataCompanion.insert({
+    required String utenteUsername,
+    required String emozioneNome,
+    required DateTime dataRegistrazione,
+    this.rowid = const Value.absent(),
+  }) : utenteUsername = Value(utenteUsername),
+       emozioneNome = Value(emozioneNome),
+       dataRegistrazione = Value(dataRegistrazione);
+  static Insertable<EmozioneRegistrataData> custom({
+    Expression<String>? utenteUsername,
+    Expression<String>? emozioneNome,
+    Expression<DateTime>? dataRegistrazione,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (utenteUsername != null) 'utente_username': utenteUsername,
+      if (emozioneNome != null) 'emozione_nome': emozioneNome,
+      if (dataRegistrazione != null) 'data_registrazione': dataRegistrazione,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  EmozioneRegistrataCompanion copyWith({
+    Value<String>? utenteUsername,
+    Value<String>? emozioneNome,
+    Value<DateTime>? dataRegistrazione,
+    Value<int>? rowid,
+  }) {
+    return EmozioneRegistrataCompanion(
+      utenteUsername: utenteUsername ?? this.utenteUsername,
+      emozioneNome: emozioneNome ?? this.emozioneNome,
+      dataRegistrazione: dataRegistrazione ?? this.dataRegistrazione,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (utenteUsername.present) {
+      map['utente_username'] = Variable<String>(utenteUsername.value);
+    }
+    if (emozioneNome.present) {
+      map['emozione_nome'] = Variable<String>(emozioneNome.value);
+    }
+    if (dataRegistrazione.present) {
+      map['data_registrazione'] = Variable<DateTime>(dataRegistrazione.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EmozioneRegistrataCompanion(')
+          ..write('utenteUsername: $utenteUsername, ')
+          ..write('emozioneNome: $emozioneNome, ')
+          ..write('dataRegistrazione: $dataRegistrazione, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDataBase extends GeneratedDatabase {
   _$AppDataBase(QueryExecutor e) : super(e);
   $AppDataBaseManager get managers => $AppDataBaseManager(this);
   late final $EmozioneTable emozione = $EmozioneTable(this);
   late final $UtenteTable utente = $UtenteTable(this);
   late final $ConsiglioTable consiglio = $ConsiglioTable(this);
+  late final $EmozioneRegistrataTable emozioneRegistrata =
+      $EmozioneRegistrataTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -860,6 +1166,7 @@ abstract class _$AppDataBase extends GeneratedDatabase {
     emozione,
     utente,
     consiglio,
+    emozioneRegistrata,
   ];
 }
 
@@ -877,6 +1184,41 @@ typedef $$EmozioneTableUpdateCompanionBuilder =
       Value<int> valore,
       Value<int> rowid,
     });
+
+final class $$EmozioneTableReferences
+    extends BaseReferences<_$AppDataBase, $EmozioneTable, EmozioneData> {
+  $$EmozioneTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<
+    $EmozioneRegistrataTable,
+    List<EmozioneRegistrataData>
+  >
+  _emozioneRegistrataRefsTable(_$AppDataBase db) =>
+      MultiTypedResultKey.fromTable(
+        db.emozioneRegistrata,
+        aliasName: $_aliasNameGenerator(
+          db.emozione.nome,
+          db.emozioneRegistrata.emozioneNome,
+        ),
+      );
+
+  $$EmozioneRegistrataTableProcessedTableManager get emozioneRegistrataRefs {
+    final manager =
+        $$EmozioneRegistrataTableTableManager(
+          $_db,
+          $_db.emozioneRegistrata,
+        ).filter(
+          (f) => f.emozioneNome.nome.sqlEquals($_itemColumn<String>('nome')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _emozioneRegistrataRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
 
 class $$EmozioneTableFilterComposer
     extends Composer<_$AppDataBase, $EmozioneTable> {
@@ -901,6 +1243,31 @@ class $$EmozioneTableFilterComposer
     column: $table.valore,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> emozioneRegistrataRefs(
+    Expression<bool> Function($$EmozioneRegistrataTableFilterComposer f) f,
+  ) {
+    final $$EmozioneRegistrataTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nome,
+      referencedTable: $db.emozioneRegistrata,
+      getReferencedColumn: (t) => t.emozioneNome,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmozioneRegistrataTableFilterComposer(
+            $db: $db,
+            $table: $db.emozioneRegistrata,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$EmozioneTableOrderingComposer
@@ -945,6 +1312,32 @@ class $$EmozioneTableAnnotationComposer
 
   GeneratedColumn<int> get valore =>
       $composableBuilder(column: $table.valore, builder: (column) => column);
+
+  Expression<T> emozioneRegistrataRefs<T extends Object>(
+    Expression<T> Function($$EmozioneRegistrataTableAnnotationComposer a) f,
+  ) {
+    final $$EmozioneRegistrataTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.nome,
+          referencedTable: $db.emozioneRegistrata,
+          getReferencedColumn: (t) => t.emozioneNome,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EmozioneRegistrataTableAnnotationComposer(
+                $db: $db,
+                $table: $db.emozioneRegistrata,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$EmozioneTableTableManager
@@ -958,12 +1351,9 @@ class $$EmozioneTableTableManager
           $$EmozioneTableAnnotationComposer,
           $$EmozioneTableCreateCompanionBuilder,
           $$EmozioneTableUpdateCompanionBuilder,
-          (
-            EmozioneData,
-            BaseReferences<_$AppDataBase, $EmozioneTable, EmozioneData>,
-          ),
+          (EmozioneData, $$EmozioneTableReferences),
           EmozioneData,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool emozioneRegistrataRefs})
         > {
   $$EmozioneTableTableManager(_$AppDataBase db, $EmozioneTable table)
     : super(
@@ -1001,9 +1391,46 @@ class $$EmozioneTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$EmozioneTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({emozioneRegistrataRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (emozioneRegistrataRefs) db.emozioneRegistrata,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (emozioneRegistrataRefs)
+                    await $_getPrefetchedData<
+                      EmozioneData,
+                      $EmozioneTable,
+                      EmozioneRegistrataData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$EmozioneTableReferences
+                          ._emozioneRegistrataRefsTable(db),
+                      managerFromTypedResult: (p0) => $$EmozioneTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).emozioneRegistrataRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.emozioneNome == item.nome,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -1018,12 +1445,9 @@ typedef $$EmozioneTableProcessedTableManager =
       $$EmozioneTableAnnotationComposer,
       $$EmozioneTableCreateCompanionBuilder,
       $$EmozioneTableUpdateCompanionBuilder,
-      (
-        EmozioneData,
-        BaseReferences<_$AppDataBase, $EmozioneTable, EmozioneData>,
-      ),
+      (EmozioneData, $$EmozioneTableReferences),
       EmozioneData,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool emozioneRegistrataRefs})
     >;
 typedef $$UtenteTableCreateCompanionBuilder =
     UtenteCompanion Function({
@@ -1039,6 +1463,43 @@ typedef $$UtenteTableUpdateCompanionBuilder =
       Value<int> dataNascita,
       Value<int> rowid,
     });
+
+final class $$UtenteTableReferences
+    extends BaseReferences<_$AppDataBase, $UtenteTable, UtenteData> {
+  $$UtenteTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<
+    $EmozioneRegistrataTable,
+    List<EmozioneRegistrataData>
+  >
+  _emozioneRegistrataRefsTable(_$AppDataBase db) =>
+      MultiTypedResultKey.fromTable(
+        db.emozioneRegistrata,
+        aliasName: $_aliasNameGenerator(
+          db.utente.username,
+          db.emozioneRegistrata.utenteUsername,
+        ),
+      );
+
+  $$EmozioneRegistrataTableProcessedTableManager get emozioneRegistrataRefs {
+    final manager =
+        $$EmozioneRegistrataTableTableManager(
+          $_db,
+          $_db.emozioneRegistrata,
+        ).filter(
+          (f) => f.utenteUsername.username.sqlEquals(
+            $_itemColumn<String>('username')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _emozioneRegistrataRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
 
 class $$UtenteTableFilterComposer
     extends Composer<_$AppDataBase, $UtenteTable> {
@@ -1063,6 +1524,31 @@ class $$UtenteTableFilterComposer
     column: $table.dataNascita,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> emozioneRegistrataRefs(
+    Expression<bool> Function($$EmozioneRegistrataTableFilterComposer f) f,
+  ) {
+    final $$EmozioneRegistrataTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.username,
+      referencedTable: $db.emozioneRegistrata,
+      getReferencedColumn: (t) => t.utenteUsername,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmozioneRegistrataTableFilterComposer(
+            $db: $db,
+            $table: $db.emozioneRegistrata,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$UtenteTableOrderingComposer
@@ -1109,6 +1595,32 @@ class $$UtenteTableAnnotationComposer
     column: $table.dataNascita,
     builder: (column) => column,
   );
+
+  Expression<T> emozioneRegistrataRefs<T extends Object>(
+    Expression<T> Function($$EmozioneRegistrataTableAnnotationComposer a) f,
+  ) {
+    final $$EmozioneRegistrataTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.username,
+          referencedTable: $db.emozioneRegistrata,
+          getReferencedColumn: (t) => t.utenteUsername,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EmozioneRegistrataTableAnnotationComposer(
+                $db: $db,
+                $table: $db.emozioneRegistrata,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$UtenteTableTableManager
@@ -1122,9 +1634,9 @@ class $$UtenteTableTableManager
           $$UtenteTableAnnotationComposer,
           $$UtenteTableCreateCompanionBuilder,
           $$UtenteTableUpdateCompanionBuilder,
-          (UtenteData, BaseReferences<_$AppDataBase, $UtenteTable, UtenteData>),
+          (UtenteData, $$UtenteTableReferences),
           UtenteData,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool emozioneRegistrataRefs})
         > {
   $$UtenteTableTableManager(_$AppDataBase db, $UtenteTable table)
     : super(
@@ -1162,9 +1674,44 @@ class $$UtenteTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) =>
+                    (e.readTable(table), $$UtenteTableReferences(db, table, e)),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({emozioneRegistrataRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (emozioneRegistrataRefs) db.emozioneRegistrata,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (emozioneRegistrataRefs)
+                    await $_getPrefetchedData<
+                      UtenteData,
+                      $UtenteTable,
+                      EmozioneRegistrataData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$UtenteTableReferences
+                          ._emozioneRegistrataRefsTable(db),
+                      managerFromTypedResult: (p0) => $$UtenteTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).emozioneRegistrataRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.utenteUsername == item.username,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -1179,9 +1726,9 @@ typedef $$UtenteTableProcessedTableManager =
       $$UtenteTableAnnotationComposer,
       $$UtenteTableCreateCompanionBuilder,
       $$UtenteTableUpdateCompanionBuilder,
-      (UtenteData, BaseReferences<_$AppDataBase, $UtenteTable, UtenteData>),
+      (UtenteData, $$UtenteTableReferences),
       UtenteData,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool emozioneRegistrataRefs})
     >;
 typedef $$ConsiglioTableCreateCompanionBuilder =
     ConsiglioCompanion Function({
@@ -1362,6 +1909,402 @@ typedef $$ConsiglioTableProcessedTableManager =
       ConsiglioData,
       PrefetchHooks Function()
     >;
+typedef $$EmozioneRegistrataTableCreateCompanionBuilder =
+    EmozioneRegistrataCompanion Function({
+      required String utenteUsername,
+      required String emozioneNome,
+      required DateTime dataRegistrazione,
+      Value<int> rowid,
+    });
+typedef $$EmozioneRegistrataTableUpdateCompanionBuilder =
+    EmozioneRegistrataCompanion Function({
+      Value<String> utenteUsername,
+      Value<String> emozioneNome,
+      Value<DateTime> dataRegistrazione,
+      Value<int> rowid,
+    });
+
+final class $$EmozioneRegistrataTableReferences
+    extends
+        BaseReferences<
+          _$AppDataBase,
+          $EmozioneRegistrataTable,
+          EmozioneRegistrataData
+        > {
+  $$EmozioneRegistrataTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $UtenteTable _utenteUsernameTable(_$AppDataBase db) =>
+      db.utente.createAlias(
+        $_aliasNameGenerator(
+          db.emozioneRegistrata.utenteUsername,
+          db.utente.username,
+        ),
+      );
+
+  $$UtenteTableProcessedTableManager get utenteUsername {
+    final $_column = $_itemColumn<String>('utente_username')!;
+
+    final manager = $$UtenteTableTableManager(
+      $_db,
+      $_db.utente,
+    ).filter((f) => f.username.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_utenteUsernameTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $EmozioneTable _emozioneNomeTable(_$AppDataBase db) =>
+      db.emozione.createAlias(
+        $_aliasNameGenerator(
+          db.emozioneRegistrata.emozioneNome,
+          db.emozione.nome,
+        ),
+      );
+
+  $$EmozioneTableProcessedTableManager get emozioneNome {
+    final $_column = $_itemColumn<String>('emozione_nome')!;
+
+    final manager = $$EmozioneTableTableManager(
+      $_db,
+      $_db.emozione,
+    ).filter((f) => f.nome.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_emozioneNomeTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$EmozioneRegistrataTableFilterComposer
+    extends Composer<_$AppDataBase, $EmozioneRegistrataTable> {
+  $$EmozioneRegistrataTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get dataRegistrazione => $composableBuilder(
+    column: $table.dataRegistrazione,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UtenteTableFilterComposer get utenteUsername {
+    final $$UtenteTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.utenteUsername,
+      referencedTable: $db.utente,
+      getReferencedColumn: (t) => t.username,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UtenteTableFilterComposer(
+            $db: $db,
+            $table: $db.utente,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EmozioneTableFilterComposer get emozioneNome {
+    final $$EmozioneTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.emozioneNome,
+      referencedTable: $db.emozione,
+      getReferencedColumn: (t) => t.nome,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmozioneTableFilterComposer(
+            $db: $db,
+            $table: $db.emozione,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EmozioneRegistrataTableOrderingComposer
+    extends Composer<_$AppDataBase, $EmozioneRegistrataTable> {
+  $$EmozioneRegistrataTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get dataRegistrazione => $composableBuilder(
+    column: $table.dataRegistrazione,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UtenteTableOrderingComposer get utenteUsername {
+    final $$UtenteTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.utenteUsername,
+      referencedTable: $db.utente,
+      getReferencedColumn: (t) => t.username,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UtenteTableOrderingComposer(
+            $db: $db,
+            $table: $db.utente,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EmozioneTableOrderingComposer get emozioneNome {
+    final $$EmozioneTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.emozioneNome,
+      referencedTable: $db.emozione,
+      getReferencedColumn: (t) => t.nome,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmozioneTableOrderingComposer(
+            $db: $db,
+            $table: $db.emozione,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EmozioneRegistrataTableAnnotationComposer
+    extends Composer<_$AppDataBase, $EmozioneRegistrataTable> {
+  $$EmozioneRegistrataTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get dataRegistrazione => $composableBuilder(
+    column: $table.dataRegistrazione,
+    builder: (column) => column,
+  );
+
+  $$UtenteTableAnnotationComposer get utenteUsername {
+    final $$UtenteTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.utenteUsername,
+      referencedTable: $db.utente,
+      getReferencedColumn: (t) => t.username,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UtenteTableAnnotationComposer(
+            $db: $db,
+            $table: $db.utente,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EmozioneTableAnnotationComposer get emozioneNome {
+    final $$EmozioneTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.emozioneNome,
+      referencedTable: $db.emozione,
+      getReferencedColumn: (t) => t.nome,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmozioneTableAnnotationComposer(
+            $db: $db,
+            $table: $db.emozione,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EmozioneRegistrataTableTableManager
+    extends
+        RootTableManager<
+          _$AppDataBase,
+          $EmozioneRegistrataTable,
+          EmozioneRegistrataData,
+          $$EmozioneRegistrataTableFilterComposer,
+          $$EmozioneRegistrataTableOrderingComposer,
+          $$EmozioneRegistrataTableAnnotationComposer,
+          $$EmozioneRegistrataTableCreateCompanionBuilder,
+          $$EmozioneRegistrataTableUpdateCompanionBuilder,
+          (EmozioneRegistrataData, $$EmozioneRegistrataTableReferences),
+          EmozioneRegistrataData,
+          PrefetchHooks Function({bool utenteUsername, bool emozioneNome})
+        > {
+  $$EmozioneRegistrataTableTableManager(
+    _$AppDataBase db,
+    $EmozioneRegistrataTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EmozioneRegistrataTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EmozioneRegistrataTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EmozioneRegistrataTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> utenteUsername = const Value.absent(),
+                Value<String> emozioneNome = const Value.absent(),
+                Value<DateTime> dataRegistrazione = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => EmozioneRegistrataCompanion(
+                utenteUsername: utenteUsername,
+                emozioneNome: emozioneNome,
+                dataRegistrazione: dataRegistrazione,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String utenteUsername,
+                required String emozioneNome,
+                required DateTime dataRegistrazione,
+                Value<int> rowid = const Value.absent(),
+              }) => EmozioneRegistrataCompanion.insert(
+                utenteUsername: utenteUsername,
+                emozioneNome: emozioneNome,
+                dataRegistrazione: dataRegistrazione,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$EmozioneRegistrataTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({utenteUsername = false, emozioneNome = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (utenteUsername) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.utenteUsername,
+                                    referencedTable:
+                                        $$EmozioneRegistrataTableReferences
+                                            ._utenteUsernameTable(db),
+                                    referencedColumn:
+                                        $$EmozioneRegistrataTableReferences
+                                            ._utenteUsernameTable(db)
+                                            .username,
+                                  )
+                                  as T;
+                        }
+                        if (emozioneNome) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.emozioneNome,
+                                    referencedTable:
+                                        $$EmozioneRegistrataTableReferences
+                                            ._emozioneNomeTable(db),
+                                    referencedColumn:
+                                        $$EmozioneRegistrataTableReferences
+                                            ._emozioneNomeTable(db)
+                                            .nome,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$EmozioneRegistrataTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDataBase,
+      $EmozioneRegistrataTable,
+      EmozioneRegistrataData,
+      $$EmozioneRegistrataTableFilterComposer,
+      $$EmozioneRegistrataTableOrderingComposer,
+      $$EmozioneRegistrataTableAnnotationComposer,
+      $$EmozioneRegistrataTableCreateCompanionBuilder,
+      $$EmozioneRegistrataTableUpdateCompanionBuilder,
+      (EmozioneRegistrataData, $$EmozioneRegistrataTableReferences),
+      EmozioneRegistrataData,
+      PrefetchHooks Function({bool utenteUsername, bool emozioneNome})
+    >;
 
 class $AppDataBaseManager {
   final _$AppDataBase _db;
@@ -1372,4 +2315,6 @@ class $AppDataBaseManager {
       $$UtenteTableTableManager(_db, _db.utente);
   $$ConsiglioTableTableManager get consiglio =>
       $$ConsiglioTableTableManager(_db, _db.consiglio);
+  $$EmozioneRegistrataTableTableManager get emozioneRegistrata =>
+      $$EmozioneRegistrataTableTableManager(_db, _db.emozioneRegistrata);
 }
