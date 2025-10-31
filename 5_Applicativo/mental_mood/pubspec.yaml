@@ -31,6 +31,7 @@ environment:
 
 dependencies:
   #others
+  liquid_glass_renderer: ^0.2.0-dev.2
 
   # dependencies for the database
   drift: ^2.18.0 # Molto più recente

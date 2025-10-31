@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../DataBase/database.dart';
+import '../UserSelectionPage/user_selection_page.dart';
 
 class UserAddPage extends StatefulWidget {
   const UserAddPage({super.key});
@@ -30,7 +31,7 @@ class _UserAddPageState extends State<UserAddPage> {
     DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: _dataNascitaSelezionata ?? DateTime.now(),
-        firstDate: DateTime(1900),
+        firstDate: DateTime(1925),
         lastDate: DateTime.now()
     );
 
@@ -42,27 +43,44 @@ class _UserAddPageState extends State<UserAddPage> {
     }
   }
 
+  Future<bool> _isUsernameUnique(String username) async {
+    final db = AppDataBase();
+    // Usiamo una query Count per vedere se esistono utenti con quell'username
+    final count = await (db.select(db.utente)
+      ..where((u) => u.username.equals(username)))
+        .get();
+
+    // Se la lista restituita non è vuota, l'utente esiste
+    return count.isEmpty;
+  }
+
   Future<void> _saveUser() async {
-    if (usernameController.text.isEmpty || nomeController.text.isEmpty || _dataNascitaSelezionata == null) {
+    final db = AppDataBase();
+    final trimmedUsername = usernameController.text.trim();
+    final trimmedNome = nomeController.text.trim();
+
+    if(usernameController.text.isEmpty || nomeController.text.isEmpty || _dataNascitaSelezionata == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Per favore, compila tutti i campi!')),
+        const SnackBar(content: Text('Per favore, compila tutti i campi!'), backgroundColor: Colors.red,),
       );
       return;
     }
 
-    final db = AppDataBase(); // o prendi dal Provider se lo usi
+    if (!(await _isUsernameUnique(trimmedUsername))) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Questo username è già esistente!'), backgroundColor: Colors.red)
+      );
+      return;
+    }
 
     final utente = UtenteCompanion.insert(
-      username: usernameController.text,
-      nome: nomeController.text,
+      username: trimmedUsername,
+      nome: trimmedNome,
       dataNascita: _dataNascitaSelezionata!,
     );
 
-    await db.into(db.utente).insert(utente);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Utente salvato con successo! 🥳')),
-    );
+    await db.insertUtente(utente);
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const UserSelectionPage()));
   }
 
   @override

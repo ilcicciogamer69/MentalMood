@@ -1,4 +1,6 @@
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
+import 'package:mental_mood/Pages/home_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../DataBase/database.dart';
@@ -7,10 +9,14 @@ import 'emotion_visualizer.dart';
 import 'motivation_selection.dart';
 
 class EmotionSelectionPage extends StatefulWidget {
-  const EmotionSelectionPage({super.key});
+  final UtenteData? user;
+
+  const EmotionSelectionPage({super.key, required this.user});
 
   @override
-  State<EmotionSelectionPage> createState() => _EmotionSelectionPageState();
+  State<EmotionSelectionPage> createState() {
+    return _EmotionSelectionPageState();
+  }
 }
 
 class _EmotionSelectionPageState extends State<EmotionSelectionPage> {
@@ -26,10 +32,14 @@ class _EmotionSelectionPageState extends State<EmotionSelectionPage> {
     });
   }
 
-  MotivazioneData? _selectedMotivazione;
+  List<MotivazioneData> _selectedMotivazioni = [];
   void _handleMotivazioneSelection(MotivazioneData motivazione) {
     setState(() {
-      _selectedMotivazione = motivazione;
+      if(_selectedMotivazioni.contains(motivazione)){
+        _selectedMotivazioni.remove(motivazione);
+      }else{
+        _selectedMotivazioni.add(motivazione);
+      }
       print('Motivazione selezionata: ${motivazione.testo}');
     });
   }
@@ -101,6 +111,7 @@ class _EmotionSelectionPageState extends State<EmotionSelectionPage> {
                       EmotionSeletionWidget(
                         emozioni: emozioni,
                         onEmozioneSelected: _handleEmozioneSelection,
+                        emozioneSelected: _selectedEmozione
                       ),
                       // Il visualizzatore riceve lo stato dell'emozione selezionata
                       EmotionVisualizerWidget(emozione: _selectedEmozione),
@@ -162,16 +173,67 @@ class _EmotionSelectionPageState extends State<EmotionSelectionPage> {
                       MotivationSeletionWidget(
                         motivazioni: motivazioni,
                         onMotivazioneSelected: _handleMotivazioneSelection,
+                        motivazioniSelected: _selectedMotivazioni
                       ),
                     ],
                   ),
                 );
               },
             ),
+            ElevatedButton(
+                onPressed: () { _registraStatoAnimo(); },
+                child: Text(
+                    "SALVA",
+                  style: TextStyle(fontSize: 50),
+                ),
+            ),
           ],
         ),
       )
     );
+  }
+
+  void _registraStatoAnimo() async {
+    if (_selectedEmozione == null || widget.user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Seleziona un\'emozione!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final List<String> motivazioniTestoList = _selectedMotivazioni.map((m) => m.testo).toList();
+
+    final EmozioneRegistrataCompanion entry = EmozioneRegistrataCompanion(
+      utenteId: Value(widget.user!.id),
+      emozioneNome: Value(_selectedEmozione!.nome),
+      motivazioneTesto: Value(motivazioniTestoList),
+      dataRegistrazione: Value(DateTime.now()),
+    );
+
+    try {
+      await dataBase.insertEmozioneRegistrata(entry);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Stato d\'animo registrato con successo!'), backgroundColor: Colors.green),
+      );
+      setState(() {
+        _selectedEmozione = null;
+        _selectedMotivazioni = [];
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(user: widget.user),
+        ),
+      );
+    } catch (e) {
+      print('Errore durante la registrazione: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore di salvataggio: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   Future<List<EmozioneData>> _getEmozioneFromDataBase() async {
@@ -198,4 +260,6 @@ class _EmotionSelectionPageState extends State<EmotionSelectionPage> {
     }
   }
 }
+
+
 

@@ -44,11 +44,10 @@ class Emozione extends Table{ //the emotion table of the database
 }
 
 class Utente extends Table{ //the user table of the database
+  IntColumn get id => integer().autoIncrement()(); //the id of the user
   TextColumn get username=> text()(); //the username of the user
   TextColumn get nome => text()(); //the name of the user
   DateTimeColumn get dataNascita => dateTime()(); //the date of birth of the user
-  @override
-  Set<Column> get primaryKey => {username};
 }
 
 class Consiglio extends Table{ //the advice table of the database
@@ -56,18 +55,18 @@ class Consiglio extends Table{ //the advice table of the database
   TextColumn get testo => text()(); //the content of the advice
   IntColumn get valoreIniziale => integer()(); //the initial value of the advice
   IntColumn get valoreFinale => integer()(); //the final value of the advice
-  @override
-  Set<Column> get primaryKey => {id};
 }
 
 // Tabella di join tra Emozione, Utente e Motivazione, insieme alla data di registrazione
 class EmozioneRegistrata extends Table {
-  TextColumn get utenteUsername => text().references(Utente, #username)();
+  IntColumn get utenteId => integer().references(Utente, #id)();
   TextColumn get emozioneNome => text().references(Emozione, #nome)();
-  TextColumn get motivazioneTesto => text().references(Motivazione, #testo)();
+
+  TextColumn get motivazioneTesto => text().map(StringListConverter())();
+
   DateTimeColumn get dataRegistrazione => dateTime()();
   @override
-  Set<Column> get primaryKey => {utenteUsername, emozioneNome, motivazioneTesto, dataRegistrazione};
+  Set<Column> get primaryKey => {utenteId, emozioneNome, dataRegistrazione};
 }
 
 LazyDatabase _openConnection(){
@@ -132,6 +131,30 @@ class AppDataBase extends _$AppDataBase{
 
   Future<void> insertUtente(UtenteCompanion utente) async {
     await into(this.utente).insert(utente);
+  }
+
+  Future<void> deleteUser(id) async {
+    await (delete(utente)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  Future<void> deleteUsers(utenti) async {
+    await delete(utenti).go();
+  }
+
+  Future<int> insertEmozioneRegistrata(EmozioneRegistrataCompanion entry) async {
+    return into(emozioneRegistrata).insert(entry);
+  }
+
+  Future<List<EmozioneRegistrataData>> getEmozioniRegistrateByUserId(int userId) {
+    // Query per selezionare tutti i record di EmozioneRegistrata
+    return (select(emozioneRegistrata)
+    // Filtra solo quelli con l'utenteId corrispondente
+      ..where((e) => e.utenteId.equals(userId))
+    // Ordina per dataRegistrazione in modo decrescente (i più recenti in alto)
+      ..orderBy([
+            (t) => OrderingTerm(expression: t.dataRegistrazione, mode: OrderingMode.desc)
+      ])
+    ).get();
   }
 }
 

@@ -153,6 +153,12 @@ class DatabaseUtil {
             testo: "Rumori Improvvisi o Forti"
         ));
         print('   - Inserito: Rumori Improvvisi o Forti');
+
+
+        await db.into(db.motivazione).insert(MotivazioneCompanion.insert(
+            testo: "Altro"
+        ));
+        print('   - Inserito: Altro');
       }
     } catch (e) {
       print('Errore durante il popolamento del database: $e');

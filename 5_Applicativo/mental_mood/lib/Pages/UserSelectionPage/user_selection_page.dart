@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mental_mood/Pages/UserAddPage/user_add_page.dart';
 import 'package:mental_mood/Pages/UserSelectionPage/user_selection.dart';
+import 'package:mental_mood/Pages/home_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../DataBase/database.dart';
-import '../EmotionSelectionPage/emotion_selection.dart';
-import '../EmotionSelectionPage/emotion_visualizer.dart';
-import '../EmotionSelectionPage/motivation_selection.dart';
 
 class UserSelectionPage extends StatefulWidget {
   const UserSelectionPage({super.key});
@@ -17,18 +15,75 @@ class UserSelectionPage extends StatefulWidget {
 
 class _UserSelectionPageState extends State<UserSelectionPage> {
   late AppDataBase dataBase;
+  var deleteUtenti = false;
 
   UtenteData? _selectedUser;
-  void _handleUserSelection(UtenteData utente) {
-    setState(() {
+  void _handleUserSelection(UtenteData utente) async {
+    if (deleteUtenti) {
+      try {
+        await dataBase.deleteUser(utente.id);
+        setState(() {});
+      } catch (e) {
+        print('Errore durante l\'eliminazione: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Errore DB: $e')),
+        );
+      }
+    } else {
       _selectedUser = utente;
-      print('Utente selezionato: ${utente.username}');
+      Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(user: _selectedUser)));
+    }
+  }
+
+  void _deleteUtenti() {
+    setState(() {
+      deleteUtenti = !deleteUtenti;
     });
   }
 
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     dataBase = Provider.of<AppDataBase>(context);
+
+    // Forza il caricamento delle immagini nella cache
+    precacheImage(
+      const AssetImage('assets/images/bg.jpg'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/images/angry.jpg'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/images/anxious.jpg'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/images/happy.jpg'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/images/ok.jpg'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/images/sad.jpg'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/images/uncertain.jpg'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/images/unknown.jpg'),
+      context,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //dataBase = Provider.of<AppDataBase>(context);
 
     return Scaffold(
         backgroundColor: Colors.yellow[200],
@@ -70,22 +125,17 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.sentiment_dissatisfied, size: 64, color: Colors.red,),
-                          const Text(
-                            "Nessun utente trovato",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          const Text(
-                            "Prova a riavviare l'app",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          IconButton(icon: const Icon(Icons.add_circle, color: Colors.black, size: 208), onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => const UserAddPage()));},)
+                          IconButton(
+                            icon: const Icon(Icons.add_circle, color: Colors.black, size: 208),
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const UserAddPage()));
+                            },)
                         ],
                       ),
                     );
                   }
 
-                  // Se tutto è ok, mostra la lista delle emozioni
+                  // Se tutto è ok, mostra la lista degli utenti
                   final utenti = snapshot.data!;
                   return SingleChildScrollView(
                     child: Column(
@@ -94,13 +144,36 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
                         UserSeletionWidget(
                           utenti: utenti,
                           onUtenteSelected: _handleUserSelection,
+                          deleteUtenti: deleteUtenti,
                         ),
-                        IconButton(icon: const Icon(Icons.add_circle, color: Colors.black, size: 208), onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => const UserAddPage()));},)
+                        IconButton(icon: const Icon(Icons.add_circle, color: Colors.black, size: 208),
+                          onPressed: () {
+                           Navigator.push(
+                               context,
+                               MaterialPageRoute(
+                                   builder: (context) => const UserAddPage()
+                               )
+                           ).then((_) {
+                             setState(() {});
+                           });
+                          },
+                        ),
                       ],
                     ),
                   );
                 },
               ),
+              ElevatedButton(
+                onPressed: () { _deleteUtenti(); },
+                child: Row(
+                  children: [
+                    Icon(Icons.delete, color: Colors.red),
+                    Text(
+                      deleteUtenti ? "Termina eliminazioni" : "Elimina utenti"
+                    )
+                  ],
+                )
+              )
             ],
           ),
         )

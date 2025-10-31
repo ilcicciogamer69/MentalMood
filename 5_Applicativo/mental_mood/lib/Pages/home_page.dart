@@ -1,16 +1,12 @@
-import 'package:drift/drift.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mental_mood/DataBase/database.dart';
+import 'package:mental_mood/Pages/menu.dart';
 import 'package:provider/provider.dart';
-
-import 'EmotionSelectionPage/emotion_selection_page.dart';
-
-void main() {
-  runApp(const HomePage());
-}
+import '../DataBase/database.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final UtenteData? user;
+  const HomePage({super.key, required this.user});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -18,93 +14,98 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late AppDataBase dataBase;
-  // This widget is the root of your application.
+
+  Future<List<EmozioneRegistrataData>> _getRegistrazioni() async {
+    final userId = widget.user?.id;
+    if (userId != null) {
+      return dataBase.getEmozioniRegistrateByUserId(userId);
+    }
+    return [];
+  }
+
   @override
   Widget build(BuildContext context) {
     dataBase = Provider.of<AppDataBase>(context);
     return Scaffold(
-        backgroundColor: Colors.yellow[200],
-        body: FutureBuilder<List<EmozioneData>>(
-            builder: (context, snapshot){
-              if(snapshot.hasData){
-                List<EmozioneData>? listEmozioni = snapshot.data;
-                if(listEmozioni!=null ){
-                  if(listEmozioni.isEmpty){
-                    return Center(
-                      child: Text(
-                        "Non sono state trovate emozioni. Riprova più tardi.",
-                        style: TextStyle(fontSize: 60),
-                      ),
-                    );
-                  }else{
-                   return listEmozioniUI(listEmozioni);
-                  }
-                }
-              }else if(snapshot.hasError){
-                return Center(
-                  child: Text(
-                    snapshot.error.toString(),
-                    style: TextStyle(fontSize: 60),
-                  ),
-                );
-              }
-              return Center(
-                child: Text(
-                    "Non sono state trovate emozioni. Riprova più tardi.",
-                    style: TextStyle(fontSize: 60),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/bg.jpg"),
+              fit: BoxFit.cover,
+            )
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    Text("Bentornato, ",style: TextStyle(color: Colors.black, fontSize: 67)),
+                    Text(
+                        widget.user!.nome,
+                        style: TextStyle(color: Colors.black, fontSize: 67)
+                    ),
+                  ],
                 ),
-              );
-            },
-            future: _getEmozioneFromDataBase(),
-        ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          _navigateToDetail('Aggiungi nuova emozione', EmozioneCompanion(
-            nome: Value(''),
-            imgPath: Value(''),
-            valore: Value(0),
-          ));
-        },
-        shape: const CircleBorder(
-          side: BorderSide(color: Colors.black, width: 2),
-        ),
-        child: const Icon(Icons.add),
-      )
-    );
-  }
-  Future<List<EmozioneData>> _getEmozioneFromDataBase() async{
-    return await dataBase.getEmozioneList();
-  }
-  Widget listEmozioniUI(List<EmozioneData> listEmozioni) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: ListView.builder(
-        itemCount: listEmozioni.length,
-        itemBuilder: (context, index) {
-          EmozioneData emozione = listEmozioni[index];
-          return Card(
-            child: ListTile(
-              title: Text(emozione.nome),
-              subtitle: Text("Valore: ${emozione.valore}"), // Leggermente migliorato per chiarezza
-              onTap: () {
-                _navigateToDetail(
-                  emozione.nome,
-                  EmozioneCompanion(
-                    nome: Value(emozione.nome),
-                    imgPath: Value(emozione.imgPath),
-                    valore: Value(emozione.valore),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
-    );
-  }
+              ),
+              Expanded(
+                child: FutureBuilder<List<EmozioneRegistrataData>>(
+                  future: _getRegistrazioni(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(child: Text("Errore: ${snapshot.error}"));
+                    }
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(
+                          child: Text("Nessuna emozione registrata trovata.",
+                              style: TextStyle(fontSize: 18, color: Colors.grey)));
+                    }
 
-  void _navigateToDetail(String title, EmozioneCompanion emozioneCompanion) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => EmotionSelectionPage()));
+                    // Mostra la lista dei risultati
+                    final registrazioni = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: registrazioni.length,
+                      itemBuilder: (context, index) {
+                        final registrazione = registrazioni[index];
+
+                        // Prepara la lista di motivazioni
+                        // La lista di stringhe viene unita per essere mostrata
+                        final motivazioniString = registrazione.motivazioneTesto.join(', ');
+
+                        return Card(
+                          elevation: 2,
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: ListTile(
+                            title: Text(
+                              "Emozione: ${registrazione.emozioneNome}",
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            subtitle: Text(
+                              "Motivazioni: $motivazioniString\nData: ${registrazione.dataRegistrazione.toLocal().toString().substring(0, 16)}",
+                            ),
+                            leading: const Icon(Icons.favorite_border), // Icona a tua scelta
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: Menu(user: widget.user),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
   }
 }
 
