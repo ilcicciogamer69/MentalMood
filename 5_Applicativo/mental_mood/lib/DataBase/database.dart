@@ -35,6 +35,14 @@ class Motivazione extends Table{ //the motivation table of the database
   Set<Column> get primaryKey => {testo};
 }
 
+class Impostazione extends Table{ //the settings table of the database
+  IntColumn get cronologia => integer()(); //the cronology of the settings
+  BoolColumn get notifiche => boolean()(); //the notifications of the settings
+  IntColumn get utenteId => integer().references(Utente, #id)(); //the id of the user
+  @override
+  Set<Column> get primaryKey => {utenteId};
+}
+
 class Emozione extends Table{ //the emotion table of the database
   TextColumn get nome => text()(); //the name value of the emotion
   TextColumn get imgPath => text()(); //the path of the image of the emotion
@@ -57,13 +65,11 @@ class Consiglio extends Table{ //the advice table of the database
   IntColumn get valoreFinale => integer()(); //the final value of the advice
 }
 
-// Tabella di join tra Emozione, Utente e Motivazione, insieme alla data di registrazione
+// Join table of Emozione, Utente & Motivazione, with the date of registration
 class EmozioneRegistrata extends Table {
   IntColumn get utenteId => integer().references(Utente, #id)();
   TextColumn get emozioneNome => text().references(Emozione, #nome)();
-
   TextColumn get motivazioneTesto => text().map(StringListConverter())();
-
   DateTimeColumn get dataRegistrazione => dateTime()();
   @override
   Set<Column> get primaryKey => {utenteId, emozioneNome, dataRegistrazione};
@@ -82,7 +88,7 @@ LazyDatabase _openConnection(){
 
 // This annotation tells drift to prepare a database
 // class that uses the tables we just defined.
-@DriftDatabase(tables: [Emozione, Utente, Consiglio, EmozioneRegistrata, Motivazione])
+@DriftDatabase(tables: [Emozione, Utente, Consiglio, EmozioneRegistrata, Motivazione, Impostazione])
 class AppDataBase extends _$AppDataBase{
   // We tell the database where to store the data with this constructor.
   AppDataBase(): super(_openConnection());
@@ -120,6 +126,9 @@ class AppDataBase extends _$AppDataBase{
   Future<List<MotivazioneData>> getMotivazioneList() async{
     return await select(motivazione).get();
   }
+  Future<List<ImpostazioneData>> getImpostazioni(idUtente) async{
+    return await (select(impostazione)..where((tbl) => tbl.utenteId.equals(idUtente))).get();
+  }
 
   Future<void> deleteMotivazione(testo) async {
     await (delete(motivazione)..where((tbl) => tbl.testo.equals(testo))).go();
@@ -155,6 +164,10 @@ class AppDataBase extends _$AppDataBase{
             (t) => OrderingTerm(expression: t.dataRegistrazione, mode: OrderingMode.desc)
       ])
     ).get();
+  }
+
+  Future<void> updateImpostazioni(ImpostazioneCompanion entry) {
+    return (update(impostazione)..where((t) => t.utenteId.equals(entry.utenteId.value))).write(entry);
   }
 }
 

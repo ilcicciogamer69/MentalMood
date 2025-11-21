@@ -9,7 +9,6 @@ class DatabaseUtil {
       if (existingEmotions.isEmpty) {
         //Inserimento emozioni predefinite
 
-        // Inserisci una per una per debugging
         await db.into(db.emozione).insert(EmozioneCompanion.insert(
             nome: 'Disperato o Depresso',
             imgPath: 'assets/images/sad.png',
@@ -87,7 +86,6 @@ class DatabaseUtil {
       final existingMotivations = await db.getMotivazioneList();
       if (existingMotivations.isEmpty) {
         //Inserimento motivazioni predefinite
-        // Inserisci una per una per debugging
 
         await db.into(db.motivazione).insert(MotivazioneCompanion.insert(
             testo: "Relazioni Sociali"
@@ -159,6 +157,28 @@ class DatabaseUtil {
             testo: "Altro"
         ));
         print('   - Inserito: Altro');
+      }
+    } catch (e) {
+      print('Errore durante il popolamento del database: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> populateDefaultSettings(AppDataBase db, UtenteData utente) async {
+    try {
+      //Verifica impostazioni esistenti
+
+      final existingSettings = await db.getImpostazioni(utente.id);
+      if (existingSettings.isEmpty) {
+        //Inserimento impostazioni predefinite
+
+        await db.into(db.impostazione).insert(ImpostazioneCompanion.insert(
+            cronologia: 4,
+            notifiche: true,
+        ));
+        print(
+            '   - Inserito: Cronologia: 0, Notifiche: true all\'utente ${utente
+                .username}');
       }
     } catch (e) {
       print('Errore durante il popolamento del database: $e');

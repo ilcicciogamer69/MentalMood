@@ -1399,6 +1399,270 @@ class MotivazioneCompanion extends UpdateCompanion<MotivazioneData> {
   }
 }
 
+class $ImpostazioneTable extends Impostazione
+    with TableInfo<$ImpostazioneTable, ImpostazioneData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ImpostazioneTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cronologiaMeta = const VerificationMeta(
+    'cronologia',
+  );
+  @override
+  late final GeneratedColumn<int> cronologia = GeneratedColumn<int>(
+    'cronologia',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _notificheMeta = const VerificationMeta(
+    'notifiche',
+  );
+  @override
+  late final GeneratedColumn<bool> notifiche = GeneratedColumn<bool>(
+    'notifiche',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("notifiche" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _utenteIdMeta = const VerificationMeta(
+    'utenteId',
+  );
+  @override
+  late final GeneratedColumn<int> utenteId = GeneratedColumn<int>(
+    'utente_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES utente (id)',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [cronologia, notifiche, utenteId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'impostazione';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ImpostazioneData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('cronologia')) {
+      context.handle(
+        _cronologiaMeta,
+        cronologia.isAcceptableOrUnknown(data['cronologia']!, _cronologiaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cronologiaMeta);
+    }
+    if (data.containsKey('notifiche')) {
+      context.handle(
+        _notificheMeta,
+        notifiche.isAcceptableOrUnknown(data['notifiche']!, _notificheMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_notificheMeta);
+    }
+    if (data.containsKey('utente_id')) {
+      context.handle(
+        _utenteIdMeta,
+        utenteId.isAcceptableOrUnknown(data['utente_id']!, _utenteIdMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {utenteId};
+  @override
+  ImpostazioneData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ImpostazioneData(
+      cronologia: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cronologia'],
+      )!,
+      notifiche: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}notifiche'],
+      )!,
+      utenteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}utente_id'],
+      )!,
+    );
+  }
+
+  @override
+  $ImpostazioneTable createAlias(String alias) {
+    return $ImpostazioneTable(attachedDatabase, alias);
+  }
+}
+
+class ImpostazioneData extends DataClass
+    implements Insertable<ImpostazioneData> {
+  final int cronologia;
+  final bool notifiche;
+  final int utenteId;
+  const ImpostazioneData({
+    required this.cronologia,
+    required this.notifiche,
+    required this.utenteId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['cronologia'] = Variable<int>(cronologia);
+    map['notifiche'] = Variable<bool>(notifiche);
+    map['utente_id'] = Variable<int>(utenteId);
+    return map;
+  }
+
+  ImpostazioneCompanion toCompanion(bool nullToAbsent) {
+    return ImpostazioneCompanion(
+      cronologia: Value(cronologia),
+      notifiche: Value(notifiche),
+      utenteId: Value(utenteId),
+    );
+  }
+
+  factory ImpostazioneData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ImpostazioneData(
+      cronologia: serializer.fromJson<int>(json['cronologia']),
+      notifiche: serializer.fromJson<bool>(json['notifiche']),
+      utenteId: serializer.fromJson<int>(json['utenteId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cronologia': serializer.toJson<int>(cronologia),
+      'notifiche': serializer.toJson<bool>(notifiche),
+      'utenteId': serializer.toJson<int>(utenteId),
+    };
+  }
+
+  ImpostazioneData copyWith({
+    int? cronologia,
+    bool? notifiche,
+    int? utenteId,
+  }) => ImpostazioneData(
+    cronologia: cronologia ?? this.cronologia,
+    notifiche: notifiche ?? this.notifiche,
+    utenteId: utenteId ?? this.utenteId,
+  );
+  ImpostazioneData copyWithCompanion(ImpostazioneCompanion data) {
+    return ImpostazioneData(
+      cronologia: data.cronologia.present
+          ? data.cronologia.value
+          : this.cronologia,
+      notifiche: data.notifiche.present ? data.notifiche.value : this.notifiche,
+      utenteId: data.utenteId.present ? data.utenteId.value : this.utenteId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImpostazioneData(')
+          ..write('cronologia: $cronologia, ')
+          ..write('notifiche: $notifiche, ')
+          ..write('utenteId: $utenteId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(cronologia, notifiche, utenteId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ImpostazioneData &&
+          other.cronologia == this.cronologia &&
+          other.notifiche == this.notifiche &&
+          other.utenteId == this.utenteId);
+}
+
+class ImpostazioneCompanion extends UpdateCompanion<ImpostazioneData> {
+  final Value<int> cronologia;
+  final Value<bool> notifiche;
+  final Value<int> utenteId;
+  const ImpostazioneCompanion({
+    this.cronologia = const Value.absent(),
+    this.notifiche = const Value.absent(),
+    this.utenteId = const Value.absent(),
+  });
+  ImpostazioneCompanion.insert({
+    required int cronologia,
+    required bool notifiche,
+    this.utenteId = const Value.absent(),
+  }) : cronologia = Value(cronologia),
+       notifiche = Value(notifiche);
+  static Insertable<ImpostazioneData> custom({
+    Expression<int>? cronologia,
+    Expression<bool>? notifiche,
+    Expression<int>? utenteId,
+  }) {
+    return RawValuesInsertable({
+      if (cronologia != null) 'cronologia': cronologia,
+      if (notifiche != null) 'notifiche': notifiche,
+      if (utenteId != null) 'utente_id': utenteId,
+    });
+  }
+
+  ImpostazioneCompanion copyWith({
+    Value<int>? cronologia,
+    Value<bool>? notifiche,
+    Value<int>? utenteId,
+  }) {
+    return ImpostazioneCompanion(
+      cronologia: cronologia ?? this.cronologia,
+      notifiche: notifiche ?? this.notifiche,
+      utenteId: utenteId ?? this.utenteId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cronologia.present) {
+      map['cronologia'] = Variable<int>(cronologia.value);
+    }
+    if (notifiche.present) {
+      map['notifiche'] = Variable<bool>(notifiche.value);
+    }
+    if (utenteId.present) {
+      map['utente_id'] = Variable<int>(utenteId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImpostazioneCompanion(')
+          ..write('cronologia: $cronologia, ')
+          ..write('notifiche: $notifiche, ')
+          ..write('utenteId: $utenteId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDataBase extends GeneratedDatabase {
   _$AppDataBase(QueryExecutor e) : super(e);
   $AppDataBaseManager get managers => $AppDataBaseManager(this);
@@ -1408,6 +1672,7 @@ abstract class _$AppDataBase extends GeneratedDatabase {
   late final $EmozioneRegistrataTable emozioneRegistrata =
       $EmozioneRegistrataTable(this);
   late final $MotivazioneTable motivazione = $MotivazioneTable(this);
+  late final $ImpostazioneTable impostazione = $ImpostazioneTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1418,6 +1683,7 @@ abstract class _$AppDataBase extends GeneratedDatabase {
     consiglio,
     emozioneRegistrata,
     motivazione,
+    impostazione,
   ];
 }
 
@@ -1745,6 +2011,24 @@ final class $$UtenteTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$ImpostazioneTable, List<ImpostazioneData>>
+  _impostazioneRefsTable(_$AppDataBase db) => MultiTypedResultKey.fromTable(
+    db.impostazione,
+    aliasName: $_aliasNameGenerator(db.utente.id, db.impostazione.utenteId),
+  );
+
+  $$ImpostazioneTableProcessedTableManager get impostazioneRefs {
+    final manager = $$ImpostazioneTableTableManager(
+      $_db,
+      $_db.impostazione,
+    ).filter((f) => f.utenteId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_impostazioneRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$UtenteTableFilterComposer
@@ -1792,6 +2076,31 @@ class $$UtenteTableFilterComposer
           }) => $$EmozioneRegistrataTableFilterComposer(
             $db: $db,
             $table: $db.emozioneRegistrata,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> impostazioneRefs(
+    Expression<bool> Function($$ImpostazioneTableFilterComposer f) f,
+  ) {
+    final $$ImpostazioneTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.impostazione,
+      getReferencedColumn: (t) => t.utenteId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ImpostazioneTableFilterComposer(
+            $db: $db,
+            $table: $db.impostazione,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -1880,6 +2189,31 @@ class $$UtenteTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> impostazioneRefs<T extends Object>(
+    Expression<T> Function($$ImpostazioneTableAnnotationComposer a) f,
+  ) {
+    final $$ImpostazioneTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.impostazione,
+      getReferencedColumn: (t) => t.utenteId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ImpostazioneTableAnnotationComposer(
+            $db: $db,
+            $table: $db.impostazione,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$UtenteTableTableManager
@@ -1895,7 +2229,10 @@ class $$UtenteTableTableManager
           $$UtenteTableUpdateCompanionBuilder,
           (UtenteData, $$UtenteTableReferences),
           UtenteData,
-          PrefetchHooks Function({bool emozioneRegistrataRefs})
+          PrefetchHooks Function({
+            bool emozioneRegistrataRefs,
+            bool impostazioneRefs,
+          })
         > {
   $$UtenteTableTableManager(_$AppDataBase db, $UtenteTable table)
     : super(
@@ -1938,37 +2275,63 @@ class $$UtenteTableTableManager
                     (e.readTable(table), $$UtenteTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({emozioneRegistrataRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (emozioneRegistrataRefs) db.emozioneRegistrata,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (emozioneRegistrataRefs)
-                    await $_getPrefetchedData<
-                      UtenteData,
-                      $UtenteTable,
-                      EmozioneRegistrataData
-                    >(
-                      currentTable: table,
-                      referencedTable: $$UtenteTableReferences
-                          ._emozioneRegistrataRefsTable(db),
-                      managerFromTypedResult: (p0) => $$UtenteTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).emozioneRegistrataRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.utenteId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({emozioneRegistrataRefs = false, impostazioneRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (emozioneRegistrataRefs) db.emozioneRegistrata,
+                    if (impostazioneRefs) db.impostazione,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (emozioneRegistrataRefs)
+                        await $_getPrefetchedData<
+                          UtenteData,
+                          $UtenteTable,
+                          EmozioneRegistrataData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UtenteTableReferences
+                              ._emozioneRegistrataRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UtenteTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).emozioneRegistrataRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.utenteId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (impostazioneRefs)
+                        await $_getPrefetchedData<
+                          UtenteData,
+                          $UtenteTable,
+                          ImpostazioneData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UtenteTableReferences
+                              ._impostazioneRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UtenteTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).impostazioneRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.utenteId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -1985,7 +2348,10 @@ typedef $$UtenteTableProcessedTableManager =
       $$UtenteTableUpdateCompanionBuilder,
       (UtenteData, $$UtenteTableReferences),
       UtenteData,
-      PrefetchHooks Function({bool emozioneRegistrataRefs})
+      PrefetchHooks Function({
+        bool emozioneRegistrataRefs,
+        bool impostazioneRefs,
+      })
     >;
 typedef $$ConsiglioTableCreateCompanionBuilder =
     ConsiglioCompanion Function({
@@ -2692,6 +3058,283 @@ typedef $$MotivazioneTableProcessedTableManager =
       MotivazioneData,
       PrefetchHooks Function()
     >;
+typedef $$ImpostazioneTableCreateCompanionBuilder =
+    ImpostazioneCompanion Function({
+      required int cronologia,
+      required bool notifiche,
+      Value<int> utenteId,
+    });
+typedef $$ImpostazioneTableUpdateCompanionBuilder =
+    ImpostazioneCompanion Function({
+      Value<int> cronologia,
+      Value<bool> notifiche,
+      Value<int> utenteId,
+    });
+
+final class $$ImpostazioneTableReferences
+    extends
+        BaseReferences<_$AppDataBase, $ImpostazioneTable, ImpostazioneData> {
+  $$ImpostazioneTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $UtenteTable _utenteIdTable(_$AppDataBase db) => db.utente.createAlias(
+    $_aliasNameGenerator(db.impostazione.utenteId, db.utente.id),
+  );
+
+  $$UtenteTableProcessedTableManager get utenteId {
+    final $_column = $_itemColumn<int>('utente_id')!;
+
+    final manager = $$UtenteTableTableManager(
+      $_db,
+      $_db.utente,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_utenteIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ImpostazioneTableFilterComposer
+    extends Composer<_$AppDataBase, $ImpostazioneTable> {
+  $$ImpostazioneTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get cronologia => $composableBuilder(
+    column: $table.cronologia,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get notifiche => $composableBuilder(
+    column: $table.notifiche,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UtenteTableFilterComposer get utenteId {
+    final $$UtenteTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.utenteId,
+      referencedTable: $db.utente,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UtenteTableFilterComposer(
+            $db: $db,
+            $table: $db.utente,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ImpostazioneTableOrderingComposer
+    extends Composer<_$AppDataBase, $ImpostazioneTable> {
+  $$ImpostazioneTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get cronologia => $composableBuilder(
+    column: $table.cronologia,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get notifiche => $composableBuilder(
+    column: $table.notifiche,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UtenteTableOrderingComposer get utenteId {
+    final $$UtenteTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.utenteId,
+      referencedTable: $db.utente,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UtenteTableOrderingComposer(
+            $db: $db,
+            $table: $db.utente,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ImpostazioneTableAnnotationComposer
+    extends Composer<_$AppDataBase, $ImpostazioneTable> {
+  $$ImpostazioneTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get cronologia => $composableBuilder(
+    column: $table.cronologia,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get notifiche =>
+      $composableBuilder(column: $table.notifiche, builder: (column) => column);
+
+  $$UtenteTableAnnotationComposer get utenteId {
+    final $$UtenteTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.utenteId,
+      referencedTable: $db.utente,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UtenteTableAnnotationComposer(
+            $db: $db,
+            $table: $db.utente,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ImpostazioneTableTableManager
+    extends
+        RootTableManager<
+          _$AppDataBase,
+          $ImpostazioneTable,
+          ImpostazioneData,
+          $$ImpostazioneTableFilterComposer,
+          $$ImpostazioneTableOrderingComposer,
+          $$ImpostazioneTableAnnotationComposer,
+          $$ImpostazioneTableCreateCompanionBuilder,
+          $$ImpostazioneTableUpdateCompanionBuilder,
+          (ImpostazioneData, $$ImpostazioneTableReferences),
+          ImpostazioneData,
+          PrefetchHooks Function({bool utenteId})
+        > {
+  $$ImpostazioneTableTableManager(_$AppDataBase db, $ImpostazioneTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ImpostazioneTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ImpostazioneTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ImpostazioneTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> cronologia = const Value.absent(),
+                Value<bool> notifiche = const Value.absent(),
+                Value<int> utenteId = const Value.absent(),
+              }) => ImpostazioneCompanion(
+                cronologia: cronologia,
+                notifiche: notifiche,
+                utenteId: utenteId,
+              ),
+          createCompanionCallback:
+              ({
+                required int cronologia,
+                required bool notifiche,
+                Value<int> utenteId = const Value.absent(),
+              }) => ImpostazioneCompanion.insert(
+                cronologia: cronologia,
+                notifiche: notifiche,
+                utenteId: utenteId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ImpostazioneTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({utenteId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (utenteId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.utenteId,
+                                referencedTable: $$ImpostazioneTableReferences
+                                    ._utenteIdTable(db),
+                                referencedColumn: $$ImpostazioneTableReferences
+                                    ._utenteIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ImpostazioneTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDataBase,
+      $ImpostazioneTable,
+      ImpostazioneData,
+      $$ImpostazioneTableFilterComposer,
+      $$ImpostazioneTableOrderingComposer,
+      $$ImpostazioneTableAnnotationComposer,
+      $$ImpostazioneTableCreateCompanionBuilder,
+      $$ImpostazioneTableUpdateCompanionBuilder,
+      (ImpostazioneData, $$ImpostazioneTableReferences),
+      ImpostazioneData,
+      PrefetchHooks Function({bool utenteId})
+    >;
 
 class $AppDataBaseManager {
   final _$AppDataBase _db;
@@ -2706,4 +3349,6 @@ class $AppDataBaseManager {
       $$EmozioneRegistrataTableTableManager(_db, _db.emozioneRegistrata);
   $$MotivazioneTableTableManager get motivazione =>
       $$MotivazioneTableTableManager(_db, _db.motivazione);
+  $$ImpostazioneTableTableManager get impostazione =>
+      $$ImpostazioneTableTableManager(_db, _db.impostazione);
 }

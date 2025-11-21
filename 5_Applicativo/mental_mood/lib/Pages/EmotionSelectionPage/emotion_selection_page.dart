@@ -61,6 +61,23 @@ class _EmotionSelectionPageState extends State<EmotionSelectionPage> {
             FutureBuilder<List<EmozioneData>>(
               future: _getEmozioneFromDataBase(),
               builder: (context, snapshot){
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  final emozioni = snapshot.data!;
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Passiamo la lista di dati PRONTA e la callback
+                        EmotionSeletionWidget(
+                            emozioni: emozioni,
+                            onEmozioneSelected: _handleEmozioneSelection,
+                            emozioneSelected: _selectedEmozione
+                        ),
+                        // Il visualizzatore riceve lo stato dell'emozione selezionata
+                        EmotionVisualizerWidget(emozione: _selectedEmozione),
+                      ],
+                    ),
+                  );
+                }
                 if (snapshot.hasError) {
                   return Center(
                     child: Column(
@@ -123,6 +140,21 @@ class _EmotionSelectionPageState extends State<EmotionSelectionPage> {
             FutureBuilder<List<MotivazioneData>>(
               future: _getMotivazioneFromDataBase(),
               builder: (context, snapshot){
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  final motivazioni = snapshot.data!;
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Passiamo la lista di dati PRONTA e la callback
+                        MotivationSeletionWidget(
+                            motivazioni: motivazioni,
+                            onMotivazioneSelected: _handleMotivazioneSelection,
+                            motivazioniSelected: _selectedMotivazioni
+                        ),
+                      ],
+                    ),
+                  );
+                }
                 if (snapshot.hasError) {
                   return Center(
                     child: Column(

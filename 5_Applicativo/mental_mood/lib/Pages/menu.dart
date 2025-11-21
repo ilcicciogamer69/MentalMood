@@ -75,7 +75,7 @@ class Menu extends StatelessWidget {
                             IconButton(
                               padding: const EdgeInsets.only(left: 20.0),
                               onPressed: (){_navigateToHomePage(context);},
-                              icon: Icon(Icons.home, size: 67, color: Colors.white,),
+                              icon: Icon(Icons.home, size: 67, color: Colors.black,),
                               style: ButtonStyle(
                                 shape: WidgetStateProperty.all<OutlinedBorder>(
                                   const CircleBorder(),
@@ -90,7 +90,7 @@ class Menu extends StatelessWidget {
                             ),
                             IconButton(
                               onPressed: (){_navigateToEmotionSelectionPage(context);},
-                              icon: Icon(Icons.add, size: 67, color: Colors.white,),
+                              icon: Icon(Icons.add, size: 67, color: Colors.black,),
                               style: ButtonStyle(
                                 shape: WidgetStateProperty.all<OutlinedBorder>(
                                   const CircleBorder(),

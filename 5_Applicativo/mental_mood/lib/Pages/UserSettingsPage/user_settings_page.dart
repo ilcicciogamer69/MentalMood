@@ -1,13 +1,97 @@
+import 'dart:ffi';
+
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:mental_mood/DataBase/database.dart';
 import 'package:mental_mood/Pages/menu.dart';
+import 'package:mental_mood/Utils/database_util.dart';
+import 'package:mental_mood/Utils/settings_util.dart';
+import 'package:provider/provider.dart';
 
-class UserSettingsPage extends StatelessWidget {
+class UserSettingsPage extends StatefulWidget {
   final UtenteData? user;
   const UserSettingsPage({super.key, required UtenteData? this.user});
 
+
+  @override
+  State<UserSettingsPage> createState() => _UserSettingsPageState();
+}
+
+class _UserSettingsPageState extends State<UserSettingsPage> {
+  String _selectedCronologiaValue = "MAI";
+  String _selectedNotificaValue = "SI";
+  Future<List<ImpostazioneData>>? _settingsFuture;
+
+
+
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Inizializza il Future solo una volta
+    if (_settingsFuture == null && widget.user != null) {
+      final dataBase = Provider.of<AppDataBase>(context);
+      _settingsFuture = dataBase.getImpostazioni(widget.user!.id);
+    }
+  }
+
+  void _updateCronologia(AppDataBase db, String? newValue, bool currentNotifiche) async {
+    if (newValue == null || newValue == _selectedCronologiaValue) return;
+    final int valueForDb = SettingsUtil().cronologiaStringToInt(newValue);
+    setState(() {
+      _selectedCronologiaValue = newValue;
+    });
+
+    try {
+      final updatedSettings = ImpostazioneCompanion(
+        utenteId: Value(widget.user!.id),
+        cronologia: Value(valueForDb),
+        notifiche: Value(currentNotifiche),
+      );
+      await db.updateImpostazioni(updatedSettings);
+      setState(() {
+        _settingsFuture = db.getImpostazioni(widget.user!.id);
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore di salvataggio: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+
+
+  void _updateNotifica(AppDataBase db, String? newValue, int currentCronologia) async {
+    if (newValue == null || newValue == _selectedNotificaValue) return;
+    final bool valueForDb = SettingsUtil().notificaStringToBool(newValue);
+    setState(() {
+      _selectedNotificaValue = newValue;
+    });
+
+    try {
+      final updatedSettings = ImpostazioneCompanion(
+        utenteId: Value(widget.user!.id),
+        cronologia: Value(currentCronologia),
+        notifiche: Value(valueForDb),
+      );
+      await db.updateImpostazioni(updatedSettings);
+      setState(() {
+        _settingsFuture = db.getImpostazioni(widget.user!.id);
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore di salvataggio: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
+    final dataBase = Provider.of<AppDataBase>(context);
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -29,7 +113,7 @@ class UserSettingsPage extends StatelessWidget {
                   children: [
                     Text("Bentornato, ",style: TextStyle(color: Colors.black, fontSize: 67)),
                     Text(
-                        user!.nome,
+                        widget.user!.nome,
                         style: TextStyle(color: Colors.black, fontSize: 67)
                     ),
                   ],
@@ -41,18 +125,98 @@ class UserSettingsPage extends StatelessWidget {
                   children: [
                     Text("Bentornato, ",style: TextStyle(color: Colors.black, fontSize: 67)),
                     Text(
-                        user!.username,
+                        widget.user!.username,
                         style: TextStyle(color: Colors.black, fontSize: 67)
                     ),
                   ],
                 ),
               ),
+
+
+
+
+
+
+              FutureBuilder<List<ImpostazioneData>>(
+                future: dataBase.getImpostazioni(widget.user?.id),
+                builder: (context, snapshot){
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Errore: ${snapshot.error}"));
+                  }
+                  if(!snapshot.hasData || snapshot.data!.isEmpty) {
+                    Future.delayed(Duration.zero, () {
+                      DatabaseUtil dbUtil = DatabaseUtil();
+                      dbUtil.populateDefaultSettings(dataBase, widget.user!)
+                          .then((_) => setState(() {}));
+                    });
+                  }
+
+                  final ImpostazioneData impostazioni = snapshot.data!.first;
+
+                  final String dbCronologiaString = SettingsUtil().cronologiaIntToString(impostazioni.cronologia);
+                  if(_selectedCronologiaValue != dbCronologiaString){
+                    Future.microtask(() => setState(() {
+                      _selectedCronologiaValue = dbCronologiaString;
+                    }));
+                  }
+
+                  List<String> cronologiaItems = ["MAI", "30 giorni", "60 giorni", "90 giorni"];
+
+
+                  final String dbNotificaString = SettingsUtil().notificaBoolToString(impostazioni.notifiche);
+                  if(_selectedNotificaValue != dbNotificaString){
+                    Future.microtask(() => setState(() {
+                      _selectedNotificaValue = dbNotificaString;
+                    }));
+                  }
+
+                  List<String> notificaItems = ["SI", "NO"];
+
+                  return Column(
+                    children: [
+                      DropdownButton<String>(
+                        value: _selectedCronologiaValue,
+                        onChanged: (newValue){
+                          _updateCronologia(dataBase, newValue, impostazioni.notifiche);
+                        },
+                        items: cronologiaItems.map((String selezione){
+                          return DropdownMenuItem<String>(
+                              value: selezione,
+                              child: new Text(selezione)
+                          );
+                        }).toList(),
+                      ),
+                      DropdownButton<String>(
+                        value: _selectedNotificaValue,
+                        onChanged: (newValue){
+                          _updateNotifica(dataBase, newValue, impostazioni.cronologia);
+                        },
+                        items: notificaItems.map((String selezione){
+                          return DropdownMenuItem<String>(
+                              value: selezione,
+                              child: new Text(selezione)
+                          );
+                        }).toList(),
+                      ),
+                      Text("Cronologia: ${impostazioni.cronologia}", style: const TextStyle(fontSize: 30)),
+                      Text("Cronologia: ${impostazioni.cronologia}", style: const TextStyle(fontSize: 30)),
+                      Text("Notifiche: ${impostazioni.notifiche ? 'Attive' : 'Disattive'}", style: const TextStyle(fontSize: 30)),
+                    ],
+                  );
+                },
+              ),
             ],
           ),
         ),
       ),
-      floatingActionButton: Menu(user: user),
+      floatingActionButton: Menu(user: widget.user),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+
   }
 }
+
+
