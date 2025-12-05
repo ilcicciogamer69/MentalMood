@@ -801,8 +801,6 @@ class ConsiglioData extends DataClass implements Insertable<ConsiglioData> {
           other.testo == this.testo &&
           other.valoreIniziale == this.valoreIniziale &&
           other.valoreFinale == this.valoreFinale);
-
-  operator [](int other) {}
 }
 
 class ConsiglioCompanion extends UpdateCompanion<ConsiglioData> {
@@ -1418,20 +1416,6 @@ class $ImpostazioneTable extends Impostazione
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _notificheMeta = const VerificationMeta(
-    'notifiche',
-  );
-  @override
-  late final GeneratedColumn<bool> notifiche = GeneratedColumn<bool>(
-    'notifiche',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("notifiche" IN (0, 1))',
-    ),
-  );
   static const VerificationMeta _utenteIdMeta = const VerificationMeta(
     'utenteId',
   );
@@ -1447,7 +1431,7 @@ class $ImpostazioneTable extends Impostazione
     ),
   );
   @override
-  List<GeneratedColumn> get $columns => [cronologia, notifiche, utenteId];
+  List<GeneratedColumn> get $columns => [cronologia, utenteId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1468,14 +1452,6 @@ class $ImpostazioneTable extends Impostazione
     } else if (isInserting) {
       context.missing(_cronologiaMeta);
     }
-    if (data.containsKey('notifiche')) {
-      context.handle(
-        _notificheMeta,
-        notifiche.isAcceptableOrUnknown(data['notifiche']!, _notificheMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_notificheMeta);
-    }
     if (data.containsKey('utente_id')) {
       context.handle(
         _utenteIdMeta,
@@ -1495,10 +1471,6 @@ class $ImpostazioneTable extends Impostazione
         DriftSqlType.int,
         data['${effectivePrefix}cronologia'],
       )!,
-      notifiche: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}notifiche'],
-      )!,
       utenteId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}utente_id'],
@@ -1515,18 +1487,12 @@ class $ImpostazioneTable extends Impostazione
 class ImpostazioneData extends DataClass
     implements Insertable<ImpostazioneData> {
   final int cronologia;
-  final bool notifiche;
   final int utenteId;
-  const ImpostazioneData({
-    required this.cronologia,
-    required this.notifiche,
-    required this.utenteId,
-  });
+  const ImpostazioneData({required this.cronologia, required this.utenteId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['cronologia'] = Variable<int>(cronologia);
-    map['notifiche'] = Variable<bool>(notifiche);
     map['utente_id'] = Variable<int>(utenteId);
     return map;
   }
@@ -1534,7 +1500,6 @@ class ImpostazioneData extends DataClass
   ImpostazioneCompanion toCompanion(bool nullToAbsent) {
     return ImpostazioneCompanion(
       cronologia: Value(cronologia),
-      notifiche: Value(notifiche),
       utenteId: Value(utenteId),
     );
   }
@@ -1546,7 +1511,6 @@ class ImpostazioneData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ImpostazioneData(
       cronologia: serializer.fromJson<int>(json['cronologia']),
-      notifiche: serializer.fromJson<bool>(json['notifiche']),
       utenteId: serializer.fromJson<int>(json['utenteId']),
     );
   }
@@ -1555,26 +1519,20 @@ class ImpostazioneData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'cronologia': serializer.toJson<int>(cronologia),
-      'notifiche': serializer.toJson<bool>(notifiche),
       'utenteId': serializer.toJson<int>(utenteId),
     };
   }
 
-  ImpostazioneData copyWith({
-    int? cronologia,
-    bool? notifiche,
-    int? utenteId,
-  }) => ImpostazioneData(
-    cronologia: cronologia ?? this.cronologia,
-    notifiche: notifiche ?? this.notifiche,
-    utenteId: utenteId ?? this.utenteId,
-  );
+  ImpostazioneData copyWith({int? cronologia, int? utenteId}) =>
+      ImpostazioneData(
+        cronologia: cronologia ?? this.cronologia,
+        utenteId: utenteId ?? this.utenteId,
+      );
   ImpostazioneData copyWithCompanion(ImpostazioneCompanion data) {
     return ImpostazioneData(
       cronologia: data.cronologia.present
           ? data.cronologia.value
           : this.cronologia,
-      notifiche: data.notifiche.present ? data.notifiche.value : this.notifiche,
       utenteId: data.utenteId.present ? data.utenteId.value : this.utenteId,
     );
   }
@@ -1583,58 +1541,48 @@ class ImpostazioneData extends DataClass
   String toString() {
     return (StringBuffer('ImpostazioneData(')
           ..write('cronologia: $cronologia, ')
-          ..write('notifiche: $notifiche, ')
           ..write('utenteId: $utenteId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(cronologia, notifiche, utenteId);
+  int get hashCode => Object.hash(cronologia, utenteId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ImpostazioneData &&
           other.cronologia == this.cronologia &&
-          other.notifiche == this.notifiche &&
           other.utenteId == this.utenteId);
 }
 
 class ImpostazioneCompanion extends UpdateCompanion<ImpostazioneData> {
   final Value<int> cronologia;
-  final Value<bool> notifiche;
   final Value<int> utenteId;
   const ImpostazioneCompanion({
     this.cronologia = const Value.absent(),
-    this.notifiche = const Value.absent(),
     this.utenteId = const Value.absent(),
   });
   ImpostazioneCompanion.insert({
     required int cronologia,
-    required bool notifiche,
     this.utenteId = const Value.absent(),
-  }) : cronologia = Value(cronologia),
-       notifiche = Value(notifiche);
+  }) : cronologia = Value(cronologia);
   static Insertable<ImpostazioneData> custom({
     Expression<int>? cronologia,
-    Expression<bool>? notifiche,
     Expression<int>? utenteId,
   }) {
     return RawValuesInsertable({
       if (cronologia != null) 'cronologia': cronologia,
-      if (notifiche != null) 'notifiche': notifiche,
       if (utenteId != null) 'utente_id': utenteId,
     });
   }
 
   ImpostazioneCompanion copyWith({
     Value<int>? cronologia,
-    Value<bool>? notifiche,
     Value<int>? utenteId,
   }) {
     return ImpostazioneCompanion(
       cronologia: cronologia ?? this.cronologia,
-      notifiche: notifiche ?? this.notifiche,
       utenteId: utenteId ?? this.utenteId,
     );
   }
@@ -1644,9 +1592,6 @@ class ImpostazioneCompanion extends UpdateCompanion<ImpostazioneData> {
     final map = <String, Expression>{};
     if (cronologia.present) {
       map['cronologia'] = Variable<int>(cronologia.value);
-    }
-    if (notifiche.present) {
-      map['notifiche'] = Variable<bool>(notifiche.value);
     }
     if (utenteId.present) {
       map['utente_id'] = Variable<int>(utenteId.value);
@@ -1658,7 +1603,6 @@ class ImpostazioneCompanion extends UpdateCompanion<ImpostazioneData> {
   String toString() {
     return (StringBuffer('ImpostazioneCompanion(')
           ..write('cronologia: $cronologia, ')
-          ..write('notifiche: $notifiche, ')
           ..write('utenteId: $utenteId')
           ..write(')'))
         .toString();
@@ -3063,13 +3007,11 @@ typedef $$MotivazioneTableProcessedTableManager =
 typedef $$ImpostazioneTableCreateCompanionBuilder =
     ImpostazioneCompanion Function({
       required int cronologia,
-      required bool notifiche,
       Value<int> utenteId,
     });
 typedef $$ImpostazioneTableUpdateCompanionBuilder =
     ImpostazioneCompanion Function({
       Value<int> cronologia,
-      Value<bool> notifiche,
       Value<int> utenteId,
     });
 
@@ -3111,11 +3053,6 @@ class $$ImpostazioneTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get notifiche => $composableBuilder(
-    column: $table.notifiche,
-    builder: (column) => ColumnFilters(column),
-  );
-
   $$UtenteTableFilterComposer get utenteId {
     final $$UtenteTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -3151,11 +3088,6 @@ class $$ImpostazioneTableOrderingComposer
   });
   ColumnOrderings<int> get cronologia => $composableBuilder(
     column: $table.cronologia,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get notifiche => $composableBuilder(
-    column: $table.notifiche,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3196,9 +3128,6 @@ class $$ImpostazioneTableAnnotationComposer
     column: $table.cronologia,
     builder: (column) => column,
   );
-
-  GeneratedColumn<bool> get notifiche =>
-      $composableBuilder(column: $table.notifiche, builder: (column) => column);
 
   $$UtenteTableAnnotationComposer get utenteId {
     final $$UtenteTableAnnotationComposer composer = $composerBuilder(
@@ -3253,21 +3182,17 @@ class $$ImpostazioneTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> cronologia = const Value.absent(),
-                Value<bool> notifiche = const Value.absent(),
                 Value<int> utenteId = const Value.absent(),
               }) => ImpostazioneCompanion(
                 cronologia: cronologia,
-                notifiche: notifiche,
                 utenteId: utenteId,
               ),
           createCompanionCallback:
               ({
                 required int cronologia,
-                required bool notifiche,
                 Value<int> utenteId = const Value.absent(),
               }) => ImpostazioneCompanion.insert(
                 cronologia: cronologia,
-                notifiche: notifiche,
                 utenteId: utenteId,
               ),
           withReferenceMapper: (p0) => p0

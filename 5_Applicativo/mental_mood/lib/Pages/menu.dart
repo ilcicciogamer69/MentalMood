@@ -8,8 +8,10 @@ import 'EmotionSelectionPage/emotion_selection_page.dart';
 
 class Menu extends StatelessWidget {
   final UtenteData? user;
+  final bool homeSel;
+  final bool settSel;
 
-  const Menu({super.key, required this.user});
+  const Menu({super.key, required this.user, required this.homeSel, required this.settSel});
 
 
   void _navigateToEmotionSelectionPage(BuildContext context) {
@@ -75,7 +77,7 @@ class Menu extends StatelessWidget {
                             IconButton(
                               padding: const EdgeInsets.only(left: 20.0),
                               onPressed: (){_navigateToHomePage(context);},
-                              icon: Icon(Icons.home, size: 67, color: Colors.black,),
+                              icon: Icon(Icons.home, size: 67, color: homeSel ? Colors.white : Colors.black,),
                               style: ButtonStyle(
                                 shape: WidgetStateProperty.all<OutlinedBorder>(
                                   const CircleBorder(),
@@ -108,10 +110,10 @@ class Menu extends StatelessWidget {
                               child: InkWell(
                                 child: CircleAvatar(
                                   radius: 40,
-                                  backgroundColor: Colors.black,
+                                  backgroundColor: settSel ? Colors.white : Colors.black,
                                   child: Text(
                                     user!.username[0],
-                                    style: TextStyle(fontSize: 40, color: Colors.white),
+                                    style: TextStyle(fontSize: 40, color: settSel ? Colors.black : Colors.white),
                                   ),
                                 ),
                                 onTap: () {_navigateToUserSettingsPage(context);},

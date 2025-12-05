@@ -14,7 +14,7 @@ class MotivationSeletionWidget extends StatelessWidget {
   }
 
   Widget listMotivazioniUI(List<MotivazioneData> listMotivazioni, List<MotivazioneData?> motivazioniSelected) {
-    print('🎨 Building lista con ${listMotivazioni.length} motivazioni');
+    print('Building lista con ${listMotivazioni.length} motivazioni');
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -23,24 +23,22 @@ class MotivationSeletionWidget extends StatelessWidget {
       itemBuilder: (context, index) {
         MotivazioneData motivazione = listMotivazioni[index];
         return Card(
-          elevation: 3,
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          color: motivazioniSelected.contains(motivazione) ? Colors.lightBlue.shade50 : null,
+          elevation: 5,
+          margin: const EdgeInsets.symmetric(vertical: 6.7),
+          color: motivazioniSelected.contains(motivazione) ? Colors.yellow[200] : null,
           shape: motivazioniSelected.contains(motivazione)
               ? RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Colors.blue, width: 2),
+            side: const BorderSide(color: Colors.orange, width: 2),
           )
               : null,
           child: ListTile(
             title: Text(
               motivazione.testo,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
             ),
             onTap: () async {
               onMotivazioneSelected(motivazione);
-              //final db = AppDataBase(); // oppure usa il provider se ce l’hai
-              //await db.deleteMotivazione(motivazione.testo);
             },
           ),
         );

@@ -28,26 +28,4 @@ class SettingsUtil {
         return 4;
     }
   }
-
-  String notificaBoolToString(bool value) {
-    switch (value) {
-      case true:
-        return "SI";
-      case false:
-        return "NO";
-      default:
-        return "SI";
-    }
-  }
-
-  bool notificaStringToBool(String label) {
-    switch (label) {
-      case "SI":
-        return true;
-      case "NO":
-        return false;
-      default:
-        return true;
-    }
-  }
 }

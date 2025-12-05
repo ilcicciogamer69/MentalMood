@@ -37,7 +37,6 @@ class Motivazione extends Table{ //the motivation table of the database
 
 class Impostazione extends Table{ //the settings table of the database
   IntColumn get cronologia => integer()(); //the chronology of the settings
-  BoolColumn get notifiche => boolean()(); //the notifications of the settings
   IntColumn get utenteId => integer().references(Utente, #id)(); //the id of the user
   @override
   Set<Column> get primaryKey => {utenteId};

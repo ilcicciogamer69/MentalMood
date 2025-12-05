@@ -5,7 +5,6 @@ import 'package:mental_mood/Pages/home_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../DataBase/database.dart';
-import '../../Utils/notification_util.dart';
 
 class UserSelectionPage extends StatefulWidget {
   const UserSelectionPage({super.key});
@@ -32,23 +31,6 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
       }
     } else {
       _selectedUser = utente;
-
-      try {
-        print("Tentativo di schedulazione notifiche per utente: ${utente.nome}");
-
-        // Qui passo 3 orari standard.
-        await NotificationUtil().scheduleIfEnabled(
-            dataBase,
-            utente,
-            const TimeOfDay(hour: 9, minute: 0),  // Notifica 1
-            const TimeOfDay(hour: 14, minute: 05), // Notifica 2
-            const TimeOfDay(hour: 21, minute: 0)  // Notifica 3
-        );
-      } catch (e) {
-        print("Errore nella schedulazione notifiche: $e");
-      }
-      if (!mounted) return;
-
       Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(user: _selectedUser)));
     }
   }

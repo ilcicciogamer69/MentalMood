@@ -20,7 +20,6 @@ class UserSettingsPage extends StatefulWidget {
 
 class _UserSettingsPageState extends State<UserSettingsPage> {
   String _selectedCronologiaValue = "MAI";
-  String _selectedNotificaValue = "SI";
   Future<List<ImpostazioneData>>? _settingsFuture;
 
 
@@ -36,7 +35,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
     }
   }
 
-  void _updateCronologia(AppDataBase db, String? newValue, bool currentNotifiche) async {
+  void _updateCronologia(AppDataBase db, String? newValue) async {
     if (newValue == null || newValue == _selectedCronologiaValue) return;
     final int valueForDb = SettingsUtil().cronologiaStringToInt(newValue);
     setState(() {
@@ -47,7 +46,6 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
       final updatedSettings = ImpostazioneCompanion(
         utenteId: Value(widget.user!.id),
         cronologia: Value(valueForDb),
-        notifiche: Value(currentNotifiche),
       );
       await db.updateImpostazioni(updatedSettings);
       setState(() {
@@ -59,35 +57,6 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
       );
     }
   }
-
-
-
-  void _updateNotifica(AppDataBase db, String? newValue, int currentCronologia) async {
-    if (newValue == null || newValue == _selectedNotificaValue) return;
-    final bool valueForDb = SettingsUtil().notificaStringToBool(newValue);
-    setState(() {
-      _selectedNotificaValue = newValue;
-    });
-
-    try {
-      final updatedSettings = ImpostazioneCompanion(
-        utenteId: Value(widget.user!.id),
-        cronologia: Value(currentCronologia),
-        notifiche: Value(valueForDb),
-      );
-      await db.updateImpostazioni(updatedSettings);
-      setState(() {
-        _settingsFuture = db.getImpostazioni(widget.user!.id);
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore di salvataggio: $e'), backgroundColor: Colors.red),
-      );
-    }
-  }
-
-
-
 
 
   @override
@@ -152,95 +121,89 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
 
                   List<String> cronologiaItems = ["MAI", "30 giorni", "60 giorni", "90 giorni"];
 
-
-                  final String dbNotificaString = SettingsUtil().notificaBoolToString(impostazioni.notifiche);
-                  if(_selectedNotificaValue != dbNotificaString){
-                    Future.microtask(() => setState(() {
-                      _selectedNotificaValue = dbNotificaString;
-                    }));
-                  }
-
-                  List<String> notificaItems = ["SI", "NO"];
-
                   return Column(
                     children: [
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("Eliminazioni dati ogni: ", style: const TextStyle(fontSize: 30)),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(8.0),
-                                border: Border.all(
-                                  color: Colors.black,
-                                  width: 1.5,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 30, top: 280, right: 30, bottom: 30),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Eliminazioni dati ogni: ", style: const TextStyle(fontSize: 30)),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  border: Border.all(
+                                    color: Colors.black,
+                                    width: 1.5,
+                                  ),
                                 ),
-                              ),
-                              child: DropdownButton<String>(
-                                alignment: AlignmentGeometry.center,
-                                underline: Container(height: 0),
-                                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black, size: 36,),
-                                value: _selectedCronologiaValue,
-                                onChanged: (newValue){
-                                  _updateCronologia(dataBase, newValue, impostazioni.notifiche);
-                                },
-                                items: cronologiaItems.map((String selezione){
-                                  return DropdownMenuItem<String>(
-                                      value: selezione,
-                                      child: Center(child: Text(selezione, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.normal)))
-                                  );
-                                }).toList(),
-                              ),
-                            )
-                          ]
+                                child: DropdownButton<String>(
+                                  alignment: AlignmentGeometry.center,
+                                  underline: Container(height: 0),
+                                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black, size: 36,),
+                                  value: _selectedCronologiaValue,
+                                  onChanged: (newValue){
+                                    _updateCronologia(dataBase, newValue);
+                                  },
+                                  items: cronologiaItems.map((String selezione){
+                                    return DropdownMenuItem<String>(
+                                        value: selezione,
+                                        child: Center(child: Text(selezione, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.normal)))
+                                    );
+                                  }).toList(),
+                                ),
+                              )
+                            ]
+                        ),
                       ),
-
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("Notifiche di promemoria: ", style: const TextStyle(fontSize: 30)),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(8.0),
-                                border: Border.all(
-                                  color: Colors.black,
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: DropdownButton<String>(
-                                alignment: AlignmentGeometry.center,
-                                underline: Container(height: 0),
-                                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black, size: 36,),
-                                value: _selectedNotificaValue,
-                                onChanged: (newValue){
-                                  _updateNotifica(dataBase, newValue, impostazioni.cronologia);
-                                },
-                                items: notificaItems.map((String selezione){
-                                  return DropdownMenuItem<String>(
-                                    value: selezione,
-                                    child: Center(child: Text(selezione, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.normal)))
-                                  );
-                                }).toList(),
-                              ),
+                      Padding(
+                        padding: const EdgeInsets.all(30),
+                        child: ElevatedButton(
+                          onPressed: () { dataBase.deleteOldEmozioniRegistrate(0); },
+                          child: Text(
+                            "Elimina dati emozioni registrate",
+                            style: TextStyle(fontSize: 30),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red[200],
+                            foregroundColor: Colors.red,
+                            minimumSize: Size(450, 60),
+                            elevation: 10,
+                            side: BorderSide(color: Colors.red, width: 2),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
                             ),
-                          ]
+                          ),
+                        ),
                       ),
-
-
-                      ElevatedButton(
-                          onPressed: (){
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
+                      Padding(
+                        padding: const EdgeInsets.all(30),
+                        child: ElevatedButton(
+                          onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
                                 builder: (context) => UserSelectionPage(),
                               ),
                             );
                           },
-                          child: Text("Cambia utente", style: const TextStyle(fontSize: 30))
+                          child: Text(
+                            "Cambia utente",
+                            style: TextStyle(fontSize: 30),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.yellow[200],
+                            foregroundColor: Colors.orange,
+                            minimumSize: Size(450, 60),
+                            elevation: 10,
+                            side: BorderSide(color: Colors.orange, width: 2),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   );
@@ -250,7 +213,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
           ),
         ),
       ),
-      floatingActionButton: Menu(user: widget.user),
+      floatingActionButton: Menu(user: widget.user, homeSel: false, settSel: true,),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
 

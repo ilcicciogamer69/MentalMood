@@ -3,13 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:mental_mood/Utils/database_util.dart';
 import 'DataBase/database.dart';
 import 'Pages/UserSelectionPage/user_selection_page.dart';
-import 'Utils/NotificationService.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Inizializza notifiche
-  await NotificationService().initNotification();
 
   try {
     //Inizializzazione database...

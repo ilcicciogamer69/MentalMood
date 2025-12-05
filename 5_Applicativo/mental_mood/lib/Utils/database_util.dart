@@ -174,10 +174,9 @@ class DatabaseUtil {
 
         await db.into(db.impostazione).insert(ImpostazioneCompanion.insert(
           cronologia: 4,
-          notifiche: true,
         ));
         print(
-            '   - Inserito: Cronologia: 0, Notifiche: true all\'utente ${utente
+            '   - Inserito: Cronologia: 4 all\'utente ${utente
                 .username}');
       }
     } catch (e) {

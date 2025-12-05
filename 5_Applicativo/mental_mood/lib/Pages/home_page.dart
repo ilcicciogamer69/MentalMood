@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:mental_mood/Utils/notification_util.dart';
 import 'package:flutter/material.dart';
 import 'package:mental_mood/Pages/menu.dart';
 import 'package:provider/provider.dart';
@@ -50,13 +49,6 @@ class _HomePageState extends State<HomePage> {
       }
     }
   }
-
-  final TimeOfDay dailyNotificationTime = const TimeOfDay(hour: 10, minute: 0);
-  final TimeOfDay dailyNotificationTime2 = const TimeOfDay(hour: 15, minute: 40);
-  final TimeOfDay dailyNotificationTime3 = const TimeOfDay(hour: 20, minute: 0);
-
-  // Flag per eseguire la logica di scheduling una sola volta
-  bool _isScheduled = false;
 
   Future<List<EmozioneRegistrataData>> _getRegistrazioni() async {
     final userId = widget.user?.id;
@@ -158,7 +150,7 @@ class _HomePageState extends State<HomePage> {
                   return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Card(
-                        elevation: 4,
+                        elevation: 10,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -166,20 +158,20 @@ class _HomePageState extends State<HomePage> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Row(
+                              Row(
                                 children: [
-                                  Icon(Icons.lightbulb_outline, color: Colors.orange),
-                                  SizedBox(width: 8),
-                                  Text(
+                                  Icon(Icons.lightbulb_outline, color: Colors.yellow[700], size: 28,),
+                                  const SizedBox(width: 8),
+                                  const Text(
                                     "Consiglio per te:",
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 8,),
                               Text(
                                 consiglio.testo,
-                                style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
+                                style: const TextStyle(fontSize: 22, fontStyle: FontStyle.italic),
                               ),
                             ],
                           ),
@@ -189,15 +181,15 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.only(left: 20, top: 40),
                 child: Row(
                   children: [
-                    Text("Emozioni registrate:",style: TextStyle(color: Colors.black, fontSize: 39)),
+                    Text("Emozioni registrate:",style: TextStyle(color: Colors.black, fontSize: 55)),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+                padding: const EdgeInsets.only(left: 20, bottom: 10),
                 child: Row(
                   children: [
                     Text("(dalla più recente alla più vecchia)",style: TextStyle(color: Colors.black, fontSize: 24)),
@@ -218,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return const Center(
                           child: Text("Nessuna emozione registrata trovata.",
-                              style: TextStyle(fontSize: 18, color: Colors.grey)));
+                              style: TextStyle(fontSize: 18, color: Colors.black)));
                     }
 
                     // Mostra la lista dei risultati
@@ -233,7 +225,7 @@ class _HomePageState extends State<HomePage> {
                         final motivazioniString = registrazione.motivazioneTesto.join(', ');
 
                         return Card(
-                          elevation: 2,
+                          elevation: 10,
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: ListTile(
                             title: Text(
@@ -243,9 +235,9 @@ class _HomePageState extends State<HomePage> {
                             subtitle: Text(
                               "Motivazioni: ${motivazioniString.isEmpty ? "Nessuna motivazione selezionata." : motivazioniString}"
                               "\nData: ${registrazione.dataRegistrazione.toLocal().toString().substring(0, 16)}",
-                              style: const TextStyle(fontSize: 20),
+                              style: const TextStyle(fontSize: 24),
                             ),
-                            leading: const Icon(Icons.favorite_border), // Icona a tua scelta
+                            leading: const Icon(Icons.favorite_border, size: 39,), // Icona a tua scelta
                           ),
                         );
                       },
@@ -253,12 +245,15 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ),
-
+              Container(
+                width: double.infinity,
+                height: 175,
+              )
             ],
           ),
         ),
       ),
-      floatingActionButton: Menu(user: widget.user),
+      floatingActionButton: Menu(user: widget.user, homeSel: true, settSel: false,),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
